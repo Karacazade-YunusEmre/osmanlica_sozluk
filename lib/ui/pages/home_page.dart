@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:lugat/main.dart';
 import 'package:lugat/model/concrete/directory_model.dart';
 import 'package:lugat/utilities/enums.dart';
 
@@ -53,6 +54,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           ),
         ),
       ),
+
+      /// directory add FAB
       floatingActionButton: FloatingActionButton(
         heroTag: 'directoryAddAndUpdate',
         onPressed: () => DirectoryAddUpdateDialog(),
@@ -67,55 +70,113 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     return SlideTransition(
       position: animationSlide,
       child: Container(
-        // width: 1.sw,
-        // height: 1.sh,
-        color: const Color(0XFF333340),
-        child: ListView.builder(
-            itemCount: mainController.directoryList.length,
-            itemBuilder: (BuildContext context, int index) {
-              DirectoryModel currentDirectory = mainController.directoryList[index];
-              return Container(
-                height: 0.07.sh,
-                width: 0.5.sw,
-                margin: const EdgeInsets.all(8.0),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.white, width: 2,),
-                  borderRadius: const BorderRadius.all(Radius.circular(20)),
-                ),
-                child: Stack(
-                  children: [
-                    IconButton(
-                      onPressed: () {},
-                      icon: const Icon(
-                        Icons.delete,
-                        color: Colors.white,
+        width: 1.sw,
+        height: 1.sh,
+        color: Theme.of(context).primaryColor,
+        alignment: Alignment.centerLeft,
+        child: Container(
+          width: 0.6.sw,
+          alignment: Alignment.center,
+          child: Center(
+            child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: mainController.directoryList.length,
+                itemBuilder: (BuildContext context, int index) {
+                  DirectoryModel currentDirectory = mainController.directoryList[index];
+                  return Container(
+                    height: (currentDirectory.id == '1' || currentDirectory.id == '2') ? 0.08.sh : 0.1.sh,
+                    margin: const EdgeInsets.all(8.0),
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: mainController.selectedDirectoryId == currentDirectory.id ? Colors.deepOrangeAccent : Colors.white,
+                        width: 2,
                       ),
+                      borderRadius: const BorderRadius.all(Radius.circular(20)),
                     ),
-                    Positioned(
-                      top: 0.015.sh,
-                      left: 0.15.sw,
-                      child: Text(
-                        currentDirectory.name,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 74.sp,
+                    child: Stack(
+                      children: [
+                        /// directory item delete icon
+                        Positioned(
+                          top: 0,
+                          right: 0,
+                          child: (currentDirectory.id == '1' || currentDirectory.id == '2')
+                              ? const SizedBox()
+                              : IconButton(
+                                  onPressed: () => removeDirectoryDialog(currentDirectory),
+                                  icon: const Icon(
+                                    Icons.delete,
+                                    color: Colors.redAccent,
+                                  ),
+                                ),
                         ),
-                      ),
-                    ),
-                    Positioned(
-                      left: 0.5.sw,
-                      child: IconButton(
-                        onPressed: () {},
-                        icon: const Icon(
-                          Icons.update,
-                          color: Colors.white,
+
+                        /// sentences count in directory
+                        Positioned(
+                          top: (currentDirectory.id == '1' || currentDirectory.id == '2') ? 0.004.sh : 0.013.sh,
+                          left: 0.01.sw,
+                          child: Container(
+                            width: 0.13.sw,
+                            height: 0.13.sw,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              borderRadius: const BorderRadius.all(Radius.circular(100)),
+                              border: Border.all(
+                                color: Colors.blue,
+                                width: 1,
+                              ),
+                            ),
+                            child: Text(
+                              currentDirectory.sentenceCount.toString(),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                // fontSize: 18,
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
+
+                        /// directory item name
+                        Positioned(
+                          top: (currentDirectory.id == '1' || currentDirectory.id == '2') ? 0.02.sh : 0.03.sh,
+                          left: 0.16.sw,
+                          child: InkWell(
+                            onTap: () {
+                              setState(() {
+                                mainController.changeSelectedDirectory(currentDirectory.id);
+                              });
+                            },
+                            child: Text(
+                              currentDirectory.name,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 74.sp,
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        /// directory item update icon
+                        Positioned(
+                          top: 0.04.sh,
+                          right: 0,
+                          child: (currentDirectory.id == '1' || currentDirectory.id == '2')
+                              ? const SizedBox()
+                              : IconButton(
+                                  onPressed: () {
+                                    menuToggle();
+                                  },
+                                  icon: const Icon(
+                                    Icons.update,
+                                    color: Colors.greenAccent,
+                                  ),
+                                ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              );
-            }),
+                  );
+                }),
+          ),
+        ),
       ),
     );
   }
@@ -153,17 +214,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                     children: [
                       /// menu icon
                       IconButton(
-                        onPressed: () {
-                          setState(() {
-                            if (isMenuOpen) {
-                              animationController.reverse();
-                            } else {
-                              animationController.forward();
-                            }
-                            defaultDashboardOpacity = defaultDashboardOpacity == 1 ? 0.6 : 1;
-                            isMenuOpen = !isMenuOpen;
-                          });
-                        },
+                        onPressed: menuToggle,
                         icon: const Icon(
                           Icons.menu,
                           size: 34,
@@ -197,6 +248,62 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           ),
         ),
       ),
+    );
+  }
+
+  /// when menu button clicked
+  void menuToggle() {
+    setState(() {
+      if (isMenuOpen) {
+        animationController.reverse();
+      } else {
+        animationController.forward();
+      }
+      defaultDashboardOpacity = defaultDashboardOpacity == 1 ? 0.6 : 1;
+      isMenuOpen = !isMenuOpen;
+    });
+  }
+
+  /// directory remove alert dialog
+  void removeDirectoryDialog(DirectoryModel currentDirectory) {
+    Get.defaultDialog(
+      title: 'UYARI',
+      middleText: 'Seçilen klasörü silmek istediğinizden emin misiniz?',
+      backgroundColor: Colors.red.shade400,
+      titleStyle: const TextStyle(
+        color: Colors.white,
+        fontSize: 22,
+        fontWeight: FontWeight.bold,
+      ),
+      middleTextStyle: const TextStyle(
+        color: Colors.white,
+        fontSize: 18,
+      ),
+      radius: 30,
+      barrierDismissible: false,
+      actions: [
+        ElevatedButton(
+          onPressed: () {
+            mainController.directoryList.remove(currentDirectory);
+            directoryDal.delete(currentDirectory);
+
+            Get.back();
+            Get.snackbar(
+              'BİLGİ',
+              'Klasör başarıyla silindi.',
+              borderColor: Colors.red,
+              borderWidth: 2,
+              snackPosition: SnackPosition.BOTTOM,
+              maxWidth: 0.8.sw,
+            );
+          },
+          child: const Text('EVET'),
+        ),
+        ElevatedButton(
+          onPressed: () => Get.back(),
+          child: const Text('HAYIR'),
+        ),
+      ],
     );
   }
 }

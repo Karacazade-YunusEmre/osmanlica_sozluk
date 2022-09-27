@@ -11,8 +11,9 @@ part 'directory_model.g.dart';
 class DirectoryModel implements IBaseModel {
   String id;
   String name;
+  int sentenceCount;
 
-  DirectoryModel({required this.id, required this.name});
+  DirectoryModel({required this.id, required this.name, required this.sentenceCount});
 
   factory DirectoryModel.fromJson(Map<String, dynamic> json) => _$DirectoryModelFromJson(json);
 

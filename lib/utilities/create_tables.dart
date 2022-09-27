@@ -16,5 +16,6 @@ const createSentenceTable = '''
 const createDirectoryTable = '''
       CREATE TABLE $tableDirectoryName (
       "id" TEXT PRIMARY KEY NOT NULL,
-      "name" TEXT NOT NULL
+      "name" TEXT NOT NULL,
+      "sentenceCount" INTEGER NOT NULL
       )''';

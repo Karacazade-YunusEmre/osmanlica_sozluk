@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:lugat/main.dart';
+import 'package:lugat/utilities/string_extensions.dart';
 import 'package:uuid/uuid.dart';
 
 import '/model/concrete/directory_model.dart';
@@ -48,12 +49,12 @@ class DirectoryAddUpdateDialog {
                   ),
                 ),
                 validator: (String? value) {
-                  if (value == null || value.length < 3 || value.isEmpty) {
-                    return 'Klasör adı boş veya \n3 karakterden küçük olamaz!';
+                  if (value == null || value.length < 3 || value.length > 13 || value.isEmpty) {
+                    return 'Klasör adı boş veya \n3 karakterden küçük,\n13 karakterden büyük olamaz!';
                   }
                   return null;
                 },
-                onSaved: (String? value) => directoryName = value!,
+                onSaved: (String? value) => directoryName = value!.getFixDirectoryName,
               ),
             ),
           ),
@@ -67,7 +68,7 @@ class DirectoryAddUpdateDialog {
                     if (formKey.currentState!.validate()) {
                       formKey.currentState!.save();
 
-                      DirectoryModel directoryModel = DirectoryModel(id: const Uuid().v1(), name: directoryName);
+                      DirectoryModel directoryModel = DirectoryModel(id: const Uuid().v1(), name: directoryName, sentenceCount: 0);
 
                       mainController.directoryList.add(directoryModel);
                       directoryDal.add(directoryModel);
