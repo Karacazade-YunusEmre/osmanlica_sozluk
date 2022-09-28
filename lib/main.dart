@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -8,15 +10,18 @@ import '/repository/base/i_directory_repository.dart';
 import '/repository/base/i_sentence_repository.dart';
 import '/repository/sqlite/directory_dal.dart';
 import '/ui/pages/page_not_found.dart';
+import 'firebase_options.dart';
 import 'repository/sqlite/sentence_dal.dart';
 import 'utilities/router.dart';
 import 'utilities/ui_constant.dart';
 
+late FirebaseFirestore fireStore;
 late ISentenceRepository sentenceDal;
 late IDirectoryRepository directoryDal;
 
 void main() async {
   init;
+  await initFirebase;
   setupLocators;
   initControllers;
   runApp(const MainApp());
@@ -24,6 +29,12 @@ void main() async {
 
 void get init {
   WidgetsFlutterBinding.ensureInitialized();
+}
+
+Future<void> get initFirebase async {
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  fireStore = FirebaseFirestore.instance;
 }
 
 void get setupLocators {

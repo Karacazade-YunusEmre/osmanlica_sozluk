@@ -49,7 +49,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           () => Stack(
             children: [
               directoryListWidget,
-              dashboardWidget,
+              sentenceListWidget,
             ],
           ),
         ),
@@ -58,7 +58,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       /// directory add FAB
       floatingActionButton: FloatingActionButton(
         heroTag: 'directoryAddAndUpdate',
-        onPressed: () => DirectoryAddUpdateDialog(),
+        onPressed: () => DirectoryAddUpdateDialog(currentDirectory: null),
         tooltip: 'Klasör Ekle',
         child: const Icon(Icons.add_chart_outlined),
       ),
@@ -164,6 +164,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                               : IconButton(
                                   onPressed: () {
                                     menuToggle();
+                                    DirectoryAddUpdateDialog(currentDirectory: currentDirectory);
                                   },
                                   icon: const Icon(
                                     Icons.update,
@@ -181,8 +182,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     );
   }
 
-  /// dashboard widget
-  Widget get dashboardWidget {
+  /// sentence list widget
+  Widget get sentenceListWidget {
     return AnimatedPositioned(
       duration: defaultAnimationDuration,
       top: 0,

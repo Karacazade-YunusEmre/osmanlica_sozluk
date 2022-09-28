@@ -13,21 +13,22 @@ import '../../../controller/main_controller.dart';
 /// on 26.09.2022
 
 class DirectoryAddUpdateDialog {
+  final DirectoryModel? currentDirectory;
   final formKey = GlobalKey<FormState>();
   late MainController mainController;
   late TextEditingController textController;
   String directoryName = '';
 
-  DirectoryAddUpdateDialog() {
+  DirectoryAddUpdateDialog({required this.currentDirectory}) {
     mainController = Get.find();
-    textController = TextEditingController();
+    textController = TextEditingController(text: currentDirectory == null ? '' : currentDirectory!.name);
 
     _showDialog;
   }
 
   dynamic get _showDialog {
     return Get.defaultDialog(
-      title: 'YENİ BİR Klasör EKLEYİN',
+      title: currentDirectory == null ? 'YENİ BİR KLASÖR EKLEYİN' : 'KLASÖR ADINI GÜNCELLEYİN',
       titleStyle: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
       barrierDismissible: false,
       radius: 30,
@@ -68,16 +69,25 @@ class DirectoryAddUpdateDialog {
                     if (formKey.currentState!.validate()) {
                       formKey.currentState!.save();
 
-                      DirectoryModel directoryModel = DirectoryModel(id: const Uuid().v1(), name: directoryName, sentenceCount: 0);
+                      if (currentDirectory != null) {
+                        int directoryIndex = mainController.directoryList.indexOf(currentDirectory);
 
-                      mainController.directoryList.add(directoryModel);
-                      directoryDal.add(directoryModel);
+                        currentDirectory!.name = directoryName;
+                        mainController.directoryList[directoryIndex] = currentDirectory!;
+
+                        directoryDal.update(currentDirectory!);
+                      } else {
+                        DirectoryModel directoryModel = DirectoryModel(id: const Uuid().v1(), name: directoryName, sentenceCount: 0);
+
+                        mainController.directoryList.add(directoryModel);
+                        directoryDal.add(directoryModel);
+                      }
 
                       textController.clear();
                       Get.back();
                       Get.snackbar(
                         'BİLGİ',
-                        'Klasör başarıyla kaydedildi',
+                        currentDirectory == null ? 'Klasör başarıyla kaydedildi' : 'Klasör başarıyla güncellendi',
                         borderColor: Colors.green,
                         borderWidth: 2,
                         snackPosition: SnackPosition.BOTTOM,
@@ -85,7 +95,7 @@ class DirectoryAddUpdateDialog {
                       );
                     }
                   },
-                  child: const Text('KAYDET'),
+                  child: Text(currentDirectory == null ? 'KAYDET' : 'GÜNCELLE'),
                 ),
                 ElevatedButton(
                   onPressed: () => Get.back(),

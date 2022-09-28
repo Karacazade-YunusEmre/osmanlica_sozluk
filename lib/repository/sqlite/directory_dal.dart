@@ -55,4 +55,32 @@ class DirectoryDal implements IDirectoryRepository {
       return false;
     }
   }
+
+  @override
+  Future<bool> isTableEmpty() async {
+    Database? db = await DatabaseHelper.getDB;
+    int? count = Sqflite.firstIntValue(await db.rawQuery('SELECT * FROM $tableDirectoryName'));
+
+    if (count != null && count != 0) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  @override
+  Future<bool> addAll(List<DirectoryModel> itemList) async {
+    Database? db = await DatabaseHelper.getDB;
+    try {
+      Batch batch = db.batch();
+
+      for (DirectoryModel item in itemList) {
+        batch.insert(tableDirectoryName, item.toJson());
+      }
+      await batch.commit(noResult: true);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
 }

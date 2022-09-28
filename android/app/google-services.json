@@ -1,0 +1,126 @@
+{
+  "project_info": {
+    "project_number": "746091179193",
+    "project_id": "lugat-b17bf",
+    "storage_bucket": "lugat-b17bf.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:746091179193:android:18bab91eb1123b0509ff68",
+        "android_client_info": {
+          "package_name": "com.emreyildirim.lugat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "746091179193-rtdivieqsnm10h52em68l5g97dumjveb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCfpxezisVdDOBHpEC2-b7BXfzhiiNfcsM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "746091179193-rtdivieqsnm10h52em68l5g97dumjveb.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "746091179193-1mofce87blfbvp596llg7cif2obc0ouj.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.emreyildirim.lugat"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:746091179193:android:edce7f146cbfde4509ff68",
+        "android_client_info": {
+          "package_name": "com.example.lugat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "746091179193-rtdivieqsnm10h52em68l5g97dumjveb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCfpxezisVdDOBHpEC2-b7BXfzhiiNfcsM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "746091179193-rtdivieqsnm10h52em68l5g97dumjveb.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "746091179193-1mofce87blfbvp596llg7cif2obc0ouj.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.emreyildirim.lugat"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:746091179193:android:d386523a0e9f473b09ff68",
+        "android_client_info": {
+          "package_name": "com.example.lugat_admin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "746091179193-3c5ersbluppii2ddmv9rj5stfpau4bsp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.lugat_admin",
+            "certificate_hash": "8b1f4869c774c53aa330fd219edcce980462fe28"
+          }
+        },
+        {
+          "client_id": "746091179193-rtdivieqsnm10h52em68l5g97dumjveb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCfpxezisVdDOBHpEC2-b7BXfzhiiNfcsM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "746091179193-rtdivieqsnm10h52em68l5g97dumjveb.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "746091179193-1mofce87blfbvp596llg7cif2obc0ouj.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.emreyildirim.lugat"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

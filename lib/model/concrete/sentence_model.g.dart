@@ -11,7 +11,7 @@ SentenceModel _$SentenceModelFromJson(Map<String, dynamic> json) =>
       id: json['id'] as String,
       title: json['title'] as String,
       content: json['content'] as String,
-      listId: json['listId'] as String?,
+      directoryId: json['directoryId'] as String?,
     );
 
 Map<String, dynamic> _$SentenceModelToJson(SentenceModel instance) =>
@@ -19,5 +19,5 @@ Map<String, dynamic> _$SentenceModelToJson(SentenceModel instance) =>
       'id': instance.id,
       'title': instance.title,
       'content': instance.content,
-      'listId': instance.listId,
+      'directoryId': instance.directoryId,
     };

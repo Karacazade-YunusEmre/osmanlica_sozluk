@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 
 import '/model/concrete/directory_model.dart';
@@ -19,7 +19,8 @@ class MainController extends GetxController {
   Future<void> onInit() async {
     super.onInit();
 
-    setupDirectoryList;
+    await setupSentenceList;
+    await setupDirectoryList;
   }
 
   /// listSortCurrentValue getter
@@ -45,25 +46,42 @@ class MainController extends GetxController {
   void changeSelectedDirectory(String? newValue) {
     if (newValue != null) {
       selectedDirectoryId = newValue;
-      debugPrint('Değer değişti. $newValue');
     }
+  }
+
+  /// sentenceList setup on init
+  Future<void> get setupSentenceList async {
+    List<SentenceModel> tempSentenceList = [];
+
+    if (await sentenceDal.isTableEmpty()) {
+      /// sentence list comes from firebase
+      QuerySnapshot<Map<String, dynamic>> querySnapshot = await fireStore.collection('Sentence').get();
+      for (QueryDocumentSnapshot<Map<String, dynamic>> item in querySnapshot.docs) {
+        tempSentenceList.add(SentenceModel(id: item.data()['id'], title: item.data()['title'], content: item.data()['content'], directoryId: '1'));
+      }
+
+      sentenceDal.addAll(tempSentenceList);
+    } else {
+      tempSentenceList.addAll(await sentenceDal.getAll());
+    }
+    sentenceList.addAll(tempSentenceList);
   }
 
   /// directoryList setup on init
   Future<void> get setupDirectoryList async {
-    List<DirectoryModel>? directoryListFromDatabase = [];
-    directoryListFromDatabase.addAll(await directoryDal.getAll());
+    List<DirectoryModel> tempDirectoryList = [];
 
-    if (directoryListFromDatabase.isEmpty) {
+    if (await directoryDal.isTableEmpty()) {
       DirectoryModel allListDirectory = DirectoryModel(id: '1', name: 'Tüm Kelimeler', sentenceCount: 0);
       DirectoryModel myFavoriteDirectory = DirectoryModel(id: '2', name: 'Favorilerim', sentenceCount: 0);
 
-      directoryList.add(allListDirectory);
-      directoryList.add(myFavoriteDirectory);
-      directoryDal.add(allListDirectory);
-      directoryDal.add(myFavoriteDirectory);
+      tempDirectoryList.add(allListDirectory);
+      tempDirectoryList.add(myFavoriteDirectory);
+
+      directoryDal.addAll(tempDirectoryList);
     } else {
-      directoryList.addAll(directoryListFromDatabase);
+      tempDirectoryList.addAll(await directoryDal.getAll());
     }
+    directoryList.addAll(tempDirectoryList);
   }
 }
