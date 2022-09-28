@@ -4,7 +4,6 @@ import 'package:sqflite/sqflite.dart';
 import '/model/concrete/directory_model.dart';
 import '/repository/sqlite/database_helper.dart';
 import '/utilities/create_tables.dart';
-
 import '../base/i_directory_repository.dart';
 
 /// Created by Yunus Emre Yıldırım
@@ -53,18 +52,6 @@ class DirectoryDal implements IDirectoryRepository {
     } on Exception catch (e) {
       debugPrint('Klasör güncelleme sırasında hata çıktı. ${e.toString()}');
       return false;
-    }
-  }
-
-  @override
-  Future<bool> isTableEmpty() async {
-    Database? db = await DatabaseHelper.getDB;
-    int? count = Sqflite.firstIntValue(await db.rawQuery('SELECT * FROM $tableDirectoryName'));
-
-    if (count != null && count != 0) {
-      return false;
-    } else {
-      return true;
     }
   }
 

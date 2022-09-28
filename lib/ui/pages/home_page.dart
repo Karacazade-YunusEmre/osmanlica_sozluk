@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:lugat/main.dart';
-import 'package:lugat/model/concrete/directory_model.dart';
-import 'package:lugat/utilities/enums.dart';
 
+import '../components/widgets/sentence_list_widget.dart';
+import '/main.dart';
+import '/model/concrete/directory_model.dart';
+import '/utilities/enums.dart';
 import '../../controller/main_controller.dart';
 import '../components/dialogs/directory_add_update_dialog.dart';
 
@@ -244,6 +245,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                     ],
                   ),
                 ),
+
+                /// sentence list
+                const SentenceListWidget(),
               ],
             ),
           ),

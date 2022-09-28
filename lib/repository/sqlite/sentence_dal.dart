@@ -70,16 +70,4 @@ class SentenceDal implements ISentenceRepository {
       return false;
     }
   }
-
-  @override
-  Future<bool> isTableEmpty() async {
-    Database? db = await DatabaseHelper.getDB;
-    int? count = Sqflite.firstIntValue(await db.rawQuery('SELECT * FROM $tableSentenceName'));
-
-    if (count != null && count != 0) {
-    return false;
-    } else {
-    return true;
-    }
-  }
 }

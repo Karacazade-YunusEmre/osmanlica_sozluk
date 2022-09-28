@@ -13,6 +13,4 @@ abstract class IBaseRepository<T extends IBaseModel> {
   Future<bool> update(T item);
 
   Future<bool> delete(T item);
-
-  Future<bool> isTableEmpty();
 }

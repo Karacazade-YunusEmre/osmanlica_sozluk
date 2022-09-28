@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '/model/concrete/directory_model.dart';
@@ -52,8 +53,9 @@ class MainController extends GetxController {
   /// sentenceList setup on init
   Future<void> get setupSentenceList async {
     List<SentenceModel> tempSentenceList = [];
+    tempSentenceList.addAll(await sentenceDal.getAll());
 
-    if (await sentenceDal.isTableEmpty()) {
+    if (tempSentenceList.isEmpty) {
       /// sentence list comes from firebase
       QuerySnapshot<Map<String, dynamic>> querySnapshot = await fireStore.collection('Sentence').get();
       for (QueryDocumentSnapshot<Map<String, dynamic>> item in querySnapshot.docs) {
@@ -70,8 +72,9 @@ class MainController extends GetxController {
   /// directoryList setup on init
   Future<void> get setupDirectoryList async {
     List<DirectoryModel> tempDirectoryList = [];
+    tempDirectoryList.addAll(await directoryDal.getAll());
 
-    if (await directoryDal.isTableEmpty()) {
+    if (tempDirectoryList.isEmpty) {
       DirectoryModel allListDirectory = DirectoryModel(id: '1', name: 'Tüm Kelimeler', sentenceCount: 0);
       DirectoryModel myFavoriteDirectory = DirectoryModel(id: '2', name: 'Favorilerim', sentenceCount: 0);
 

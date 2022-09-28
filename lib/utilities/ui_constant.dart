@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 /// Created by Yunus Emre Yıldırım
 /// on 22.09.2022
@@ -18,6 +19,7 @@ class UIConstant {
         800: Color.fromRGBO(51, 51, 64, .9),
         900: Color.fromRGBO(51, 51, 64, 1),
       }),
+      textTheme: GoogleFonts.abelTextTheme(),
     );
   }
 }
