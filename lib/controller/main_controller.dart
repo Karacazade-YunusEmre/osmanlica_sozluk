@@ -20,8 +20,23 @@ class MainController extends GetxController {
   Future<void> onInit() async {
     super.onInit();
 
-    await setupSentenceList;
-    await setupDirectoryList;
+    // await setupSentenceList;
+
+    sentenceList.addAll(await sentenceDal.getAll());
+
+    // if (sentenceList.isEmpty) {
+    //   debugPrint('tablo boş');
+    //   /// sentence list comes from firebase
+    //   QuerySnapshot<Map<String, dynamic>> querySnapshot = await fireStore.collection('Sentence').get();
+    //   for (QueryDocumentSnapshot<Map<String, dynamic>> item in querySnapshot.docs) {
+    //     SentenceModel sentenceModel = SentenceModel(id: item.data()['id'], title: item.data()['title'], content: item.data()['content'], directoryId: '1');
+    //     sentenceList.add(sentenceModel);
+    //   }
+    //
+    //   sentenceDal.addAll(sentenceList);
+    // }
+
+     setupDirectoryList;
   }
 
   /// listSortCurrentValue getter
@@ -52,39 +67,32 @@ class MainController extends GetxController {
 
   /// sentenceList setup on init
   Future<void> get setupSentenceList async {
-    List<SentenceModel> tempSentenceList = [];
-    tempSentenceList.addAll(await sentenceDal.getAll());
+    sentenceList.addAll(await sentenceDal.getAll());
 
-    if (tempSentenceList.isEmpty) {
+    if (sentenceList.isEmpty) {
+      debugPrint('tablo boş');
       /// sentence list comes from firebase
       QuerySnapshot<Map<String, dynamic>> querySnapshot = await fireStore.collection('Sentence').get();
       for (QueryDocumentSnapshot<Map<String, dynamic>> item in querySnapshot.docs) {
-        tempSentenceList.add(SentenceModel(id: item.data()['id'], title: item.data()['title'], content: item.data()['content'], directoryId: '1'));
+        SentenceModel sentenceModel = SentenceModel(id: item.data()['id'], title: item.data()['title'], content: item.data()['content'], directoryId: '1');
+        sentenceList.add(sentenceModel);
       }
 
-      sentenceDal.addAll(tempSentenceList);
-    } else {
-      tempSentenceList.addAll(await sentenceDal.getAll());
+      sentenceDal.addAll(sentenceList);
     }
-    sentenceList.addAll(tempSentenceList);
   }
 
   /// directoryList setup on init
   Future<void> get setupDirectoryList async {
-    List<DirectoryModel> tempDirectoryList = [];
-    tempDirectoryList.addAll(await directoryDal.getAll());
+    directoryList.addAll(await directoryDal.getAll());
 
-    if (tempDirectoryList.isEmpty) {
+    if (directoryList.isEmpty) {
       DirectoryModel allListDirectory = DirectoryModel(id: '1', name: 'Tüm Kelimeler', sentenceCount: 0);
       DirectoryModel myFavoriteDirectory = DirectoryModel(id: '2', name: 'Favorilerim', sentenceCount: 0);
 
-      tempDirectoryList.add(allListDirectory);
-      tempDirectoryList.add(myFavoriteDirectory);
+      directoryList.addAll([allListDirectory, myFavoriteDirectory]);
 
-      directoryDal.addAll(tempDirectoryList);
-    } else {
-      tempDirectoryList.addAll(await directoryDal.getAll());
+      directoryDal.addAll(directoryList);
     }
-    directoryList.addAll(tempDirectoryList);
   }
 }

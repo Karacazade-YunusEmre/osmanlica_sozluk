@@ -208,8 +208,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 Container(
                   height: 0.1.sh,
                   decoration: BoxDecoration(
-                    color: Colors.blue,
+                    color: Colors.white,
                     borderRadius: BorderRadius.only(topLeft: Radius.circular(isMenuOpen ? animationBorderRadius.value * 100 : 0)),
+                    border: Border.all(color: Colors.blue, width: 1),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
