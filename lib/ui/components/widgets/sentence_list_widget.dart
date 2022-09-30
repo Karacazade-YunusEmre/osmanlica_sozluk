@@ -31,35 +31,35 @@ class _SentenceListWidgetState extends State<SentenceListWidget> {
     return Expanded(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: mainController.sentenceList.isEmpty
-            ? const Center(
-                child: CircularProgressIndicator(
-                  color: Colors.deepOrangeAccent,
-                ),
-              )
-            : AnimationLimiter(
-              child: ListView.builder(
-                  itemCount: mainController.sentenceList.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    SentenceModel currentSentence = mainController.sentenceList[index];
-                    return AnimationConfiguration.staggeredList(
-                      position: index,
-                      duration: const Duration(milliseconds: 500),
-                      child: SlideAnimation(
-                        verticalOffset: 50.0,
-                        child: FadeInAnimation(
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: SentenceItemWidget(
-                              currentSentence: currentSentence,
+        child: Obx(
+          () => mainController.sentenceList.isEmpty
+              ? const Center(
+                  child: CircularProgressIndicator(
+                    color: Colors.deepOrangeAccent,
+                  ),
+                )
+              : AnimationLimiter(
+                  child: ListView.builder(
+                    itemCount: mainController.sentenceList.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      SentenceModel currentSentence = mainController.sentenceList[index];
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: AnimationConfiguration.staggeredList(
+                          position: index,
+                          duration: const Duration(milliseconds: 500),
+                          child: SlideAnimation(
+                            verticalOffset: 50.0,
+                            child: FadeInAnimation(
+                              child: SentenceItemWidget(currentSentence: currentSentence),
                             ),
                           ),
                         ),
-                      ),
-                    );
-                  },
+                      );
+                    },
+                  ),
                 ),
-            ),
+        ),
       ),
     );
   }

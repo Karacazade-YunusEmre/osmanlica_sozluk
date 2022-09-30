@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
@@ -20,15 +21,20 @@ late ISentenceRepository sentenceDal;
 late IDirectoryRepository directoryDal;
 
 void main() async {
-  init;
+  await init;
   await initFirebase;
   setupLocators;
   initControllers;
   runApp(const MainApp());
 }
 
-void get init {
+Future<void> get init async {
   WidgetsFlutterBinding.ensureInitialized();
+  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    statusBarColor: Color(0XFF333340),
+    statusBarIconBrightness: Brightness.light,
+  ));
 }
 
 Future<void> get initFirebase async {

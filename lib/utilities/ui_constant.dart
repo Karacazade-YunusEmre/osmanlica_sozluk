@@ -19,7 +19,7 @@ class UIConstant {
         800: Color.fromRGBO(51, 51, 64, .9),
         900: Color.fromRGBO(51, 51, 64, 1),
       }),
-      textTheme: GoogleFonts.abelTextTheme(),
+      // textTheme: GoogleFonts.abelTextTheme(),
     );
   }
 }

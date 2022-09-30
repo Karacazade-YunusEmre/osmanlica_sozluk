@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:lugat/model/concrete/directory_model.dart';
 
 import '../../../controller/main_controller.dart';
 import '../../../model/concrete/sentence_model.dart';
@@ -82,6 +83,8 @@ class _SentenceItemWidgetState extends State<SentenceItemWidget> with SingleTick
                 textColor: _headerColor.value,
                 child: ListTile(
                   onTap: _handleTap,
+
+                  /// sentence title
                   title: Center(
                     child: Text(
                       widget.currentSentence.title,
@@ -111,12 +114,61 @@ class _SentenceItemWidgetState extends State<SentenceItemWidget> with SingleTick
               offstage: closed,
               child: TickerMode(
                 enabled: !closed,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    widget.currentSentence.content,
-                    style: const TextStyle(fontSize: 18, color: Colors.blue, fontStyle: FontStyle.italic),
-                  ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    /// directoryList dropDown button
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Colors.blue,
+                        ),
+                        borderRadius: const BorderRadius.all(Radius.circular(20)),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Obx(
+                          () => DropdownButtonHideUnderline(
+                            child: DropdownButton<DirectoryModel>(
+                              value: mainController.directoryList.firstWhere((element) => element.id == widget.currentSentence.directoryId),
+                              items: mainController.directoryList.map((directory) {
+                                return DropdownMenuItem<DirectoryModel>(
+                                  value: directory,
+                                  child: Text(directory.name),
+                                );
+                              }).toList(),
+                              selectedItemBuilder: (BuildContext context) {
+                                return mainController.directoryList.map((directory) {
+                                  return Center(
+                                    child: Text(
+                                      directory.name,
+                                      style: const TextStyle(
+                                        color: Colors.deepOrangeAccent,
+                                      ),
+                                    ),
+                                  );
+                                }).toList();
+                              },
+                              onChanged: (DirectoryModel? directoryModel) {
+                                setState(() {
+                                  mainController.changeSentenceInCurrentDirectory(currentSentence: widget.currentSentence, newDirectory: directoryModel!);
+                                });
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    /// sentence content
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        widget.currentSentence.content,
+                        style: const TextStyle(fontSize: 18, color: Colors.blue, fontStyle: FontStyle.italic),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
