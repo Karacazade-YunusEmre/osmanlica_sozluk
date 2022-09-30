@@ -10,6 +10,7 @@ import '../main.dart';
 /// on 22.09.2022
 
 class MainController extends GetxController {
+  final fixedSentenceList = [];
   final sentenceList = <SentenceModel>[].obs;
   final directoryList = <DirectoryModel>[].obs;
   final _listSortCurrentValue = ListSortEnum.increase.obs;
@@ -46,6 +47,15 @@ class MainController extends GetxController {
   void changeSelectedDirectory(String? newValue) {
     if (newValue != null) {
       selectedDirectoryId = newValue;
+      List<SentenceModel> newList = [];
+
+      for (SentenceModel item in fixedSentenceList) {
+        if (item.directoryId == selectedDirectoryId) {
+          newList.add(item);
+        }
+      }
+      sentenceList.clear();
+      sentenceList.addAll(newList);
     }
   }
 
@@ -61,6 +71,7 @@ class MainController extends GetxController {
       }
       sentenceList.addAll(await sentenceDal.getAll());
     }
+    fixedSentenceList.addAll(sentenceList);
   }
 
   /// directoryList setup on init

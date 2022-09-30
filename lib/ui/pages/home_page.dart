@@ -141,9 +141,11 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                             left: 0.16.sw,
                             child: InkWell(
                               onTap: () {
-                                setState(() {
-                                  mainController.changeSelectedDirectory(currentDirectory.id);
-                                });
+                                mainController.changeSelectedDirectory(currentDirectory.id);
+                                menuToggle();
+                                // setState(() {
+                                //   mainController.changeSelectedDirectory(currentDirectory.id);
+                                // });
                               },
                               child: Text(
                                 currentDirectory.name,
