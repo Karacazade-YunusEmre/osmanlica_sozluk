@@ -5,11 +5,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:lugat/repository/sqlite/directory_dal.dart';
 
 import '/controller/main_controller.dart';
 import '/repository/base/i_directory_repository.dart';
 import '/repository/base/i_sentence_repository.dart';
-import '/repository/sqlite/directory_dal.dart';
 import '/ui/pages/page_not_found.dart';
 import 'firebase_options.dart';
 import 'repository/sqlite/sentence_dal.dart';
@@ -24,7 +25,7 @@ void main() async {
   await init;
   await initFirebase;
   setupLocators;
-  initControllers;
+  await initControllers;
   runApp(const MainApp());
 }
 
@@ -44,17 +45,17 @@ Future<void> get initFirebase async {
 }
 
 void get setupLocators {
-  final sentenceLocator = GetIt.instance;
-  final directoryLocator = GetIt.instance;
+  final getIt = GetIt.instance;
 
-  sentenceLocator.registerSingleton<ISentenceRepository>(SentenceDal());
-  directoryLocator.registerSingleton<IDirectoryRepository>(DirectoryDal());
+  getIt.registerSingleton<ISentenceRepository>(SentenceDal());
+  getIt.registerSingleton<IDirectoryRepository>(DirectoryDal());
 
-  sentenceDal = sentenceLocator<ISentenceRepository>();
-  directoryDal = directoryLocator<IDirectoryRepository>();
+  sentenceDal = getIt<ISentenceRepository>();
+  directoryDal = getIt<IDirectoryRepository>();
 }
 
-void get initControllers {
+Future<void> get initControllers async {
+  await GetStorage.init();
   Get.put(MainController());
 }
 

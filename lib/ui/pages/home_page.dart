@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
+import '../components/widgets/search_bar_widget.dart';
 import '../components/widgets/sentence_list_widget.dart';
 import '/main.dart';
 import '/model/concrete/directory_model.dart';
@@ -57,9 +58,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       /// directory add FAB
       floatingActionButton: FloatingActionButton(
         heroTag: 'directoryAddAndUpdate',
+        backgroundColor: Theme.of(context).secondaryHeaderColor,
         onPressed: () => DirectoryAddUpdateDialog(currentDirectory: null),
         tooltip: 'Klasör Ekle',
-        child: const Icon(Icons.add_chart_outlined),
+        child:  Icon(Icons.add_chart_outlined, color: Theme.of(context).primaryColor,),
       ),
     );
   }
@@ -121,7 +123,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                               decoration: BoxDecoration(
                                 borderRadius: const BorderRadius.all(Radius.circular(100)),
                                 border: Border.all(
-                                  color: Colors.blue,
+                                  color: Theme.of(context).secondaryHeaderColor,
                                   width: 1,
                                 ),
                               ),
@@ -217,35 +219,60 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      /// menu icon
-                      IconButton(
-                        onPressed: menuToggle,
-                        icon: const Icon(
-                          Icons.menu,
-                          size: 34,
-                        ),
+                      /// menu button and title row
+                      Row(
+                        children: [
+                          /// menu icon
+                          IconButton(
+                            onPressed: menuToggle,
+                            icon: const Icon(
+                              Icons.menu,
+                              size: 34,
+                            ),
+                          ),
+
+                          /// selected directory name title
+                          Obx(
+                                () => Text(
+                              mainController.titleSelectedDirectoryName,
+                              style: TextStyle(
+                                fontSize: 60.sp,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.blue,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
 
-                      /// list sort popup menu
-                      Obx(
-                        () => PopupMenuButton<ListSortEnum>(
-                          initialValue: mainController.listSortCurrentValue,
-                          offset: const Offset(100, 50),
-                          iconSize: 34,
-                          itemBuilder: (BuildContext context) {
-                            return [
-                              const PopupMenuItem<ListSortEnum>(
-                                value: ListSortEnum.increase,
-                                child: Text('Sırala (A-Z)'),
-                              ),
-                              const PopupMenuItem<ListSortEnum>(
-                                value: ListSortEnum.decrease,
-                                child: Text('Sırala (Z-A)'),
-                              ),
-                            ];
-                          },
-                          onSelected: mainController.changelistSortCurrentValue,
-                        ),
+                      /// search button and sort popupmenu row
+                      Row(
+                        children: [
+                          /// search bar widget
+                          const SearchBarWidget(),
+
+                          /// list sort popup menu
+                          Obx(
+                                () => PopupMenuButton<ListSortEnum>(
+                              initialValue: mainController.listSortCurrentValue,
+                              offset: const Offset(100, 50),
+                              iconSize: 34,
+                              itemBuilder: (BuildContext context) {
+                                return [
+                                  const PopupMenuItem<ListSortEnum>(
+                                    value: ListSortEnum.increase,
+                                    child: Text('Sırala (A-Z)'),
+                                  ),
+                                  const PopupMenuItem<ListSortEnum>(
+                                    value: ListSortEnum.decrease,
+                                    child: Text('Sırala (Z-A)'),
+                                  ),
+                                ];
+                              },
+                              onSelected: mainController.changelistSortDirection,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),

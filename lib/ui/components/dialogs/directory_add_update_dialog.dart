@@ -32,7 +32,7 @@ class DirectoryAddUpdateDialog {
       titleStyle: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
       barrierDismissible: false,
       radius: 30,
-      backgroundColor: UIConstant.getDefaultThemeData.backgroundColor,
+      backgroundColor: UIConstant.getDefaultThemeData.primaryColor,
       content: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -42,13 +42,25 @@ class DirectoryAddUpdateDialog {
               key: formKey,
               child: TextFormField(
                 controller: textController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   hintText: 'Klasör Adını Yazın ...',
-                  label: Text('Klasör Adı'),
-                  border: OutlineInputBorder(
+                  label: const Text('Klasör Adı',style: TextStyle(color: Colors.white),),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: const BorderRadius.all(Radius.circular(20)),
+                    borderSide: BorderSide(
+                      color: UIConstant.getDefaultThemeData.secondaryHeaderColor,
+                      width: 1,
+                    ),
+                  ),
+                  enabledBorder: const OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(20)),
+                    borderSide: BorderSide(
+                      color: Colors.black,
+                      width: 1,
+                    ),
                   ),
                 ),
+
                 validator: (String? value) {
                   if (value == null || value.length < 3 || value.length > 13 || value.isEmpty) {
                     return 'Klasör adı boş veya \n3 karakterden küçük,\n13 karakterden büyük olamaz!';
@@ -95,10 +107,16 @@ class DirectoryAddUpdateDialog {
                       );
                     }
                   },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: UIConstant.getDefaultThemeData.secondaryHeaderColor,
+                  ),
                   child: Text(currentDirectory == null ? 'KAYDET' : 'GÜNCELLE'),
                 ),
                 ElevatedButton(
                   onPressed: () => Get.back(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: UIConstant.getDefaultThemeData.secondaryHeaderColor,
+                  ),
                   child: const Text('KAPAT'),
                 ),
               ],
