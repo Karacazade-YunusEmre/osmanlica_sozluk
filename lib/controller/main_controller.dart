@@ -1,7 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
+import '/utilities/string_extensions.dart';
 import '/model/concrete/directory_model.dart';
 import '/model/concrete/sentence_model.dart';
 import '/utilities/enums.dart';
@@ -13,22 +13,26 @@ import '../main.dart';
 class MainController extends GetxController {
   final selectedDirectoryBox = GetStorage();
   final fixedSentenceList = <SentenceModel>[];
+  final fixedDirectoryList = <DirectoryModel>[];
 
   final sentenceList = <SentenceModel>[].obs;
   final directoryList = <DirectoryModel>[].obs;
+
   final _listSortCurrentValue = ListSortEnum.increase.obs;
-  final _selectedDirectoryId = '1'.obs;
-  final _titleSelectedDirectoryName = 'Tüm Kelimeler'.obs;
+  final _selectedDirectoryId = ''.obs;
+  final _selectedDirectoryName = ''.obs;
 
   @override
   Future<void> onInit() async {
     super.onInit();
 
+    await setupSentenceList();
+    await setupDirectoryList();
     setupSelectedDirectoryId();
     setupSelectedDirectoryName();
-    setupSentenceList();
-    setupDirectoryList();
   }
+
+  ///#region getter and setter
 
   /// listSortCurrentValue getter
   ListSortEnum get listSortCurrentValue => _listSortCurrentValue.value;
@@ -42,11 +46,70 @@ class MainController extends GetxController {
   /// selectedDirectoryId setter
   set selectedDirectoryId(String value) => _selectedDirectoryId.value = value;
 
-  /// titleSelectedDirectoryName getter
-  String get titleSelectedDirectoryName => _titleSelectedDirectoryName.value;
+  /// selectedDirectoryName getter
+  String get selectedDirectoryName => _selectedDirectoryName.value;
 
-  /// titleSelectedDirectoryName setter
-  set titleSelectedDirectoryName(String? newValue) => _titleSelectedDirectoryName.value = newValue!;
+  /// selectedDirectoryName setter
+  set selectedDirectoryName(String? newValue) => _selectedDirectoryName.value = newValue!;
+
+  ///#endregion getter and setter
+
+  ///#region setup methods
+
+  /// sentenceList setup on init
+  Future<void> setupSentenceList() async {
+    fixedSentenceList.addAll(await sentenceDal.getAll());
+
+    if (fixedSentenceList.isEmpty) {
+      List<SentenceModel>? tempSentenceList = await firebaseStorageService.getAll();
+      if (tempSentenceList != null) {
+        fixedSentenceList.addAll(tempSentenceList);
+        sentenceDal.addAll(fixedSentenceList);
+      }
+    }
+    sentenceList.addAll(fixedSentenceList);
+  }
+
+  /// directoryList setup on init
+  Future<void> setupDirectoryList() async {
+    fixedDirectoryList.addAll(await directoryDal.getAll());
+
+    if (fixedDirectoryList.isEmpty) {
+      int sentenceListCount = sentenceList.length;
+      DirectoryModel allListDirectory = DirectoryModel(id: '1', name: 'Tüm Kelimeler', sentenceCount: sentenceListCount);
+      DirectoryModel myFavoriteDirectory = DirectoryModel(id: '2', name: 'Favorilerim', sentenceCount: 0);
+
+      fixedDirectoryList.addAll([allListDirectory, myFavoriteDirectory]);
+      directoryDal.addAll(fixedDirectoryList);
+    }
+    directoryList.addAll(fixedDirectoryList);
+  }
+
+  /// setup selected directory Id
+  void setupSelectedDirectoryId() {
+    String? directoryId = selectedDirectoryBox.read('selectedDirectoryId');
+    if (directoryId != null) {
+      selectedDirectoryId = directoryId;
+    } else {
+      selectedDirectoryId = '1';
+    }
+  }
+
+  /// setup selected directory name for title
+  void setupSelectedDirectoryName() {
+    String? directoryId = selectedDirectoryBox.read('selectedDirectoryId');
+
+    if (directoryId != null) {
+      DirectoryModel selectedDirectory = directoryList.firstWhere((directory) => directory.id == directoryId);
+      selectedDirectoryName = selectedDirectory.name;
+    } else {
+      selectedDirectoryName = 'Tüm Kelimeler';
+    }
+  }
+
+  ///#endregion setup methods
+
+  ///#region event methods
 
   /// listSortCurrentValue change value
   void changelistSortDirection(ListSortEnum? value) {
@@ -61,26 +124,48 @@ class MainController extends GetxController {
     }
   }
 
-  /// selectedDirectory change value
+  /// sort the list in descending order
+  void sortListDescending() {
+    sentenceList.sort((a, b) => a.title.compareTo(b.title));
+  }
+
+  /// sort the list in ascending order
+  void sortListAscending() {
+    sentenceList.sort((a, b) => b.title.compareTo(a.title));
+  }
+
+  /// search bar value changed
+  void searchSentence(String? query) {
+    List<SentenceModel> filteredList = [];
+    if (query == null || query.isEmpty) {
+      filteredList.addAll(fixedSentenceList);
+    } else {
+      filteredList = [];
+      filteredList = fixedSentenceList.where((element) => element.title.fixingTextForSearching.contains(query.fixingTextForSearching)).toList();
+    }
+    sentenceList.clear();
+    sentenceList.addAll(filteredList);
+  }
+
+  ///#region selectedDirectory change value
   void changeSelectedDirectory(String? newValue) {
     if (newValue != null) {
-      loadSentenceList(newValue);
+      selectedDirectoryId = newValue;
+      _loadSentenceListAccordingToDirectoryId();
 
       /// save selected directory id
       selectedDirectoryBox.write('selectedDirectoryId', newValue);
 
-      /// save selected directory name
-      DirectoryModel currentDirectory = directoryList.firstWhere((element) => element.id == selectedDirectoryId);
-      selectedDirectoryBox.write('selectedDirectoryName', currentDirectory.name);
+      DirectoryModel selectedDirectory = directoryList.firstWhere((element) => element.id == newValue);
 
       /// set selected directory name for title
-      titleSelectedDirectoryName = currentDirectory.name;
+      selectedDirectoryName = selectedDirectory.name;
     }
   }
+  ///#endregion
 
-  /// load sentenceList according to selectedDirectoryId
-  void loadSentenceList(String newValue) {
-    selectedDirectoryId = newValue;
+  ///#region load sentenceList according to selectedDirectoryId
+  void _loadSentenceListAccordingToDirectoryId() {
     List<SentenceModel> newList = [];
 
     for (SentenceModel item in fixedSentenceList) {
@@ -91,40 +176,13 @@ class MainController extends GetxController {
     sentenceList.clear();
     sentenceList.addAll(newList);
   }
-
-  /// sentenceList setup on init
-  Future<void> setupSentenceList() async {
-    fixedSentenceList.addAll(await sentenceDal.getAll());
-    if (fixedSentenceList.isEmpty) {
-      QuerySnapshot<Map<String, dynamic>> querySnapshot = await fireStore.collection('Sentence').get();
-      for (QueryDocumentSnapshot<Map<String, dynamic>> item in querySnapshot.docs) {
-        SentenceModel sentenceModel = SentenceModel(id: item.data()['id'], title: item.data()['title'], content: item.data()['content'], directoryId: '1');
-        fixedSentenceList.add(sentenceModel);
-      }
-      sentenceDal.addAll(fixedSentenceList);
-    }
-    loadSentenceList(selectedDirectoryId);
-    // sentenceList.addAll(fixedSentenceList);
-  }
-
-  /// directoryList setup on init
-  Future<void> setupDirectoryList() async {
-    directoryList.addAll(await directoryDal.getAll());
-
-    if (directoryList.isEmpty) {
-      DirectoryModel allListDirectory = DirectoryModel(id: '1', name: 'Tüm Kelimeler', sentenceCount: sentenceList.length);
-      DirectoryModel myFavoriteDirectory = DirectoryModel(id: '2', name: 'Favorilerim', sentenceCount: 0);
-
-      directoryList.addAll([allListDirectory, myFavoriteDirectory]);
-
-      directoryDal.addAll(directoryList);
-    }
-  }
+  ///#endregion
 
   /// change sentence in directory
   void changeSentenceInCurrentDirectory({required SentenceModel currentSentence, required DirectoryModel newDirectory}) {
     DirectoryModel oldDirectory = directoryList.firstWhere((element) => element.id == currentSentence.directoryId);
     currentSentence.directoryId = newDirectory.id;
+
     oldDirectory.sentenceCount--;
     newDirectory.sentenceCount++;
 
@@ -133,30 +191,6 @@ class MainController extends GetxController {
     directoryDal.update(newDirectory);
   }
 
-  /// setup selected directory Id
-  void setupSelectedDirectoryId() {
-    String? directoryId = selectedDirectoryBox.read('selectedDirectoryId');
-    if (directoryId != null) {
-      selectedDirectoryId = directoryId;
-    }
-  }
+  ///#endregion event methods
 
-  /// setup selected directory name for title
-  void setupSelectedDirectoryName() {
-    String? selectedDirectoryName = selectedDirectoryBox.read('selectedDirectoryName');
-
-    if (selectedDirectoryName != null) {
-      titleSelectedDirectoryName = selectedDirectoryName;
-    }
-  }
-
-  /// sort the list in descending order
-  void sortListDescending() {
-    sentenceList.sort((a, b) => a.title.compareTo(b.title));
-  }
-
-  /// sort the list in ascending order
-  void sortListAscending() {
-    sentenceList.sort((a, b) => b.title.compareTo(a.title));
-  }
 }

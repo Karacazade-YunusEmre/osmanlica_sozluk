@@ -61,7 +61,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> with SingleTickerProv
           ),
           child: Stack(
             children: [
-              /// clear button animated positioned
+              ///#region clear button animated positioned
               AnimatedPositioned(
                 duration: defaultAnimationDuration,
                 right: 0,
@@ -88,7 +88,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> with SingleTickerProv
                         child: InkWell(
                           onTap: () {
                             textController.clear();
-                            mainController.sentenceList.value = mainController.fixedSentenceList;
+                            // mainController.setSentenceListDefault();
                           },
                           child: const Icon(Icons.close, size: 24),
                         ),
@@ -98,7 +98,9 @@ class _SearchBarWidgetState extends State<SearchBarWidget> with SingleTickerProv
                 ),
               ),
 
-              /// search text animated positioned
+              ///#endregion clear button animated positioned
+
+              ///#region search text animated positioned
               AnimatedPositioned(
                 duration: defaultAnimationDuration,
                 left: toggle == 0 ? 0 : 0.07.sw,
@@ -113,15 +115,14 @@ class _SearchBarWidgetState extends State<SearchBarWidget> with SingleTickerProv
                     width: searchBarWidth / 1.5,
                     child: TextField(
                       controller: textController,
-                      autofocus: true,
+                      autofocus: false,
                       focusNode: focusNode,
                       cursorRadius: const Radius.circular(10.0),
                       cursorWidth: 2.0,
                       onEditingComplete: () => textController.clear(),
-                      // onChanged: mainController.searchSentence,
+                      onChanged: mainController.searchSentence,
                       textInputAction: TextInputAction.search,
                       style: const TextStyle(color: Colors.white),
-
                       cursorColor: Colors.white.withOpacity(0.5),
                       decoration: InputDecoration.collapsed(
                         // contentPadding: const EdgeInsets.only(bottom: 5),
@@ -145,7 +146,9 @@ class _SearchBarWidgetState extends State<SearchBarWidget> with SingleTickerProv
                 ),
               ),
 
-              /// search icon animated container
+              ///#endregion search text animated positioned
+
+              ///#region search icon animated container
               AnimatedBuilder(
                 animation: animationController,
                 builder: (BuildContext context, Widget? child) {
@@ -188,12 +191,15 @@ class _SearchBarWidgetState extends State<SearchBarWidget> with SingleTickerProv
                           toggle = 0;
                           animationController.reverse();
                           textController.clear();
+                          // mainController.setSentenceListDefault();
                         }
                       },
                     ),
                   );
                 },
               ),
+
+              ///#endregion search icon animated container
             ],
           ),
         );

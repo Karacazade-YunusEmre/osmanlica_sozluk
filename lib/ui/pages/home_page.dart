@@ -27,9 +27,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   late Animation<double> animationScale;
   late Animation<double> animationBorderRadius;
   late Animation<Offset> animationSlide;
+  late Animation<double> animationOpacity;
 
   bool isMenuOpen = false;
-  double defaultDashboardOpacity = 1;
 
   @override
   void initState() {
@@ -39,8 +39,16 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     defaultAnimationDuration = const Duration(milliseconds: 500);
     animationController = AnimationController(vsync: this, duration: defaultAnimationDuration);
     animationScale = Tween<double>(begin: 1.0, end: 0.6).animate(animationController);
-    animationBorderRadius = Tween<double>(begin: 0.5, end: 0).animate(animationController);
+    animationBorderRadius = Tween<double>(begin: 0, end: 0.5).animate(animationController);
     animationSlide = Tween<Offset>(begin: const Offset(-1, 0), end: const Offset(0, 0)).animate(animationController);
+    animationOpacity = Tween<double>(begin: 1.0, end: 0.6).animate(animationController);
+  }
+
+  @override
+  void dispose() {
+    animationController.dispose();
+
+    super.dispose();
   }
 
   @override
@@ -55,253 +63,299 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         ),
       ),
 
-      /// directory add FAB
+      ///#region FAB directory add
+
       floatingActionButton: FloatingActionButton(
         heroTag: 'directoryAddAndUpdate',
         backgroundColor: Theme.of(context).secondaryHeaderColor,
         onPressed: () => DirectoryAddUpdateDialog(currentDirectory: null),
         tooltip: 'Klasör Ekle',
-        child:  Icon(Icons.add_chart_outlined, color: Theme.of(context).primaryColor,),
+        child: Icon(
+          Icons.add_chart_outlined,
+          color: Theme.of(context).primaryColor,
+        ),
       ),
+
+      ///#endregion FAB directory add
     );
   }
 
-  /// directory list widget
+  ///#region directory list widget
   Widget get directoryListWidget {
-    return SlideTransition(
-      position: animationSlide,
-      child: Container(
-        width: 1.sw,
-        height: 1.sh,
-        color: Theme.of(context).primaryColor,
-        alignment: Alignment.centerLeft,
-        child: Container(
-          width: 0.6.sw,
-          alignment: Alignment.center,
-          child: Center(
-            child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: mainController.directoryList.length,
-                itemBuilder: (BuildContext context, int index) {
-                  DirectoryModel currentDirectory = mainController.directoryList[index];
-                  return Obx(
-                    () => Container(
-                      height: (currentDirectory.id == '1' || currentDirectory.id == '2') ? 0.08.sh : 0.1.sh,
-                      margin: const EdgeInsets.all(8.0),
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: mainController.selectedDirectoryId == currentDirectory.id ? Colors.deepOrangeAccent : Colors.white,
-                          width: 2,
+    return AnimatedBuilder(
+      animation: animationController,
+      builder: (BuildContext context, Widget? child) {
+        return SlideTransition(
+          position: animationSlide,
+          child: Container(
+            width: 1.sw,
+            height: 1.sh,
+            color: Theme.of(context).primaryColor,
+            alignment: Alignment.centerLeft,
+            child: Container(
+              width: 0.6.sw,
+              alignment: Alignment.center,
+              child: Center(
+                child: Obx(
+                  () => ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: mainController.directoryList.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      DirectoryModel currentDirectory = mainController.directoryList[index];
+                      return Container(
+                        height: (currentDirectory.id == '1' || currentDirectory.id == '2') ? 0.08.sh : 0.1.sh,
+                        margin: const EdgeInsets.all(8.0),
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: mainController.selectedDirectoryId == currentDirectory.id ? Colors.deepOrangeAccent : Colors.white,
+                            width: 2,
+                          ),
+                          borderRadius: const BorderRadius.all(Radius.circular(20)),
                         ),
-                        borderRadius: const BorderRadius.all(Radius.circular(20)),
+                        child: Stack(
+                          children: [
+                            ///#region current directory remove icon
+                            Positioned(
+                              top: 0,
+                              right: 0,
+                              child: (currentDirectory.id == '1' || currentDirectory.id == '2')
+                                  ? const SizedBox()
+                                  : IconButton(
+                                      onPressed: () => removeDirectoryDialog(currentDirectory),
+                                      icon: const Icon(
+                                        Icons.delete,
+                                        color: Colors.redAccent,
+                                      ),
+                                    ),
+                            ),
+
+                            ///#endregion current directory remove icon
+
+                            ///#region current directory sentence count
+                            Positioned(
+                              top: (currentDirectory.id == '1' || currentDirectory.id == '2') ? 0.004.sh : 0.013.sh,
+                              left: 0.01.sw,
+                              child: Container(
+                                width: 0.13.sw,
+                                height: 0.13.sw,
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  borderRadius: const BorderRadius.all(Radius.circular(100)),
+                                  border: Border.all(
+                                    color: Theme.of(context).secondaryHeaderColor,
+                                    width: 1,
+                                  ),
+                                ),
+                                child: Text(
+                                  currentDirectory.sentenceCount.toString(),
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    // fontSize: 18,
+                                  ),
+                                ),
+                              ),
+                            ),
+
+                            ///#endregion
+
+                            ///#region current directory name
+                            Positioned(
+                              top: (currentDirectory.id == '1' || currentDirectory.id == '2') ? 0.02.sh : 0.03.sh,
+                              left: 0.16.sw,
+                              child: InkWell(
+                                onTap: () {
+                                  mainController.changeSelectedDirectory(currentDirectory.id);
+                                  menuToggle();
+                                },
+                                child: Text(
+                                  currentDirectory.name,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 74.sp,
+                                  ),
+                                ),
+                              ),
+                            ),
+
+                            ///#endregion
+
+                            ///#region current directory update icon
+                            Positioned(
+                              top: 0.04.sh,
+                              right: 0,
+                              child: (currentDirectory.id == '1' || currentDirectory.id == '2')
+                                  ? const SizedBox()
+                                  : IconButton(
+                                      onPressed: () {
+                                        menuToggle();
+                                        DirectoryAddUpdateDialog(currentDirectory: currentDirectory);
+                                      },
+                                      icon: const Icon(
+                                        Icons.update,
+                                        color: Colors.greenAccent,
+                                      ),
+                                    ),
+                            ),
+
+                            ///#endregion
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  ///#endregion
+
+  ///#region sentence list widget
+  Widget get sentenceListWidget {
+    return AnimatedBuilder(
+      animation: animationController,
+      builder: (BuildContext context, Widget? child) {
+        return AnimatedPositioned(
+          duration: defaultAnimationDuration,
+          top: 0,
+          bottom: 0,
+          left: isMenuOpen ? 0.4.sw : 0,
+          right: isMenuOpen ? -0.6.sw : 0,
+          curve: Curves.linear,
+          child: ScaleTransition(
+            scale: animationScale,
+            child: AnimatedOpacity(
+              duration: defaultAnimationDuration,
+              opacity: animationOpacity.value,
+              child: AnimatedContainer(
+                duration: defaultAnimationDuration,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.all(Radius.circular(animationBorderRadius.value * 50)),
+                ),
+                child: Column(
+                  children: [
+                    ///#region appbar
+                    Container(
+                      height: 0.1.sh,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border(
+                          bottom: BorderSide(
+                            color: Theme.of(context).primaryColor,
+                            width: 2,
+                          ),
+                        ),
                       ),
-                      child: Stack(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          /// directory item delete icon
-                          Positioned(
-                            top: 0,
-                            right: 0,
-                            child: (currentDirectory.id == '1' || currentDirectory.id == '2')
-                                ? const SizedBox()
-                                : IconButton(
-                                    onPressed: () => removeDirectoryDialog(currentDirectory),
-                                    icon: const Icon(
-                                      Icons.delete,
-                                      color: Colors.redAccent,
-                                    ),
+                          ///#region menu button and title row
+                          Row(
+                            children: [
+                              ///#region menu icon
+                              IconButton(
+                                onPressed: menuToggle,
+                                icon: const Icon(
+                                  Icons.menu,
+                                  size: 34,
+                                ),
+                              ),
+
+                              ///#endregion menu icon
+
+                              ///#region selected directory name title
+                              Obx(
+                                () => Text(
+                                  mainController.selectedDirectoryName,
+                                  style: TextStyle(
+                                    fontSize: 60.sp,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.blue,
                                   ),
-                          ),
-
-                          /// sentences count in directory
-                          Positioned(
-                            top: (currentDirectory.id == '1' || currentDirectory.id == '2') ? 0.004.sh : 0.013.sh,
-                            left: 0.01.sw,
-                            child: Container(
-                              width: 0.13.sw,
-                              height: 0.13.sw,
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                borderRadius: const BorderRadius.all(Radius.circular(100)),
-                                border: Border.all(
-                                  color: Theme.of(context).secondaryHeaderColor,
-                                  width: 1,
                                 ),
                               ),
-                              child: Text(
-                                currentDirectory.sentenceCount.toString(),
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  // fontSize: 18,
-                                ),
-                              ),
-                            ),
+
+                              ///#endregion selected directory name title
+                            ],
                           ),
 
-                          /// directory item name
-                          Positioned(
-                            top: (currentDirectory.id == '1' || currentDirectory.id == '2') ? 0.02.sh : 0.03.sh,
-                            left: 0.16.sw,
-                            child: InkWell(
-                              onTap: () {
-                                mainController.changeSelectedDirectory(currentDirectory.id);
-                                menuToggle();
-                                // setState(() {
-                                //   mainController.changeSelectedDirectory(currentDirectory.id);
-                                // });
-                              },
-                              child: Text(
-                                currentDirectory.name,
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 74.sp,
+                          ///#endregion menu button and title row
+
+                          ///#region search button and sort popupmenu row
+                          Row(
+                            children: [
+                              ///#region search bar widget
+                              const SearchBarWidget(),
+
+                              ///#endregion search bar widget
+
+                              ///#region list sort popup menu
+                              Obx(
+                                () => PopupMenuButton<ListSortEnum>(
+                                  initialValue: mainController.listSortCurrentValue,
+                                  offset: const Offset(100, 50),
+                                  iconSize: 34,
+                                  itemBuilder: (BuildContext context) {
+                                    return [
+                                      const PopupMenuItem<ListSortEnum>(
+                                        value: ListSortEnum.increase,
+                                        child: Text('Sırala (A-Z)'),
+                                      ),
+                                      const PopupMenuItem<ListSortEnum>(
+                                        value: ListSortEnum.decrease,
+                                        child: Text('Sırala (Z-A)'),
+                                      ),
+                                    ];
+                                  },
+                                  onSelected: mainController.changelistSortDirection,
                                 ),
                               ),
-                            ),
+
+                              ///#endregion list sort popup menu
+                            ],
                           ),
 
-                          /// directory item update icon
-                          Positioned(
-                            top: 0.04.sh,
-                            right: 0,
-                            child: (currentDirectory.id == '1' || currentDirectory.id == '2')
-                                ? const SizedBox()
-                                : IconButton(
-                                    onPressed: () {
-                                      menuToggle();
-                                      DirectoryAddUpdateDialog(currentDirectory: currentDirectory);
-                                    },
-                                    icon: const Icon(
-                                      Icons.update,
-                                      color: Colors.greenAccent,
-                                    ),
-                                  ),
-                          ),
+                          ///#endregion search button and sort popupmenu row
                         ],
                       ),
                     ),
-                  );
-                }),
-          ),
-        ),
-      ),
-    );
-  }
 
-  /// sentence list widget
-  Widget get sentenceListWidget {
-    return AnimatedPositioned(
-      duration: defaultAnimationDuration,
-      top: 0,
-      bottom: 0,
-      left: isMenuOpen ? 0.4.sw : 0,
-      right: isMenuOpen ? -0.6.sw : 0,
-      curve: Curves.linear,
-      child: ScaleTransition(
-        scale: animationScale,
-        child: AnimatedOpacity(
-          duration: defaultAnimationDuration,
-          opacity: defaultDashboardOpacity,
-          child: Material(
-            elevation: 0.1.sw,
-            shadowColor: Colors.black,
-            color: Colors.white,
-            borderRadius: BorderRadius.all(Radius.circular(isMenuOpen ? animationBorderRadius.value * 100 : 0)),
-            child: Column(
-              children: [
-                /// appbar
-                Container(
-                  height: 0.1.sh,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(topLeft: Radius.circular(isMenuOpen ? animationBorderRadius.value * 100 : 0)),
-                    border: Border.all(color: Colors.blue, width: 1),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      /// menu button and title row
-                      Row(
-                        children: [
-                          /// menu icon
-                          IconButton(
-                            onPressed: menuToggle,
-                            icon: const Icon(
-                              Icons.menu,
-                              size: 34,
-                            ),
-                          ),
+                    ///#endregion appbar
 
-                          /// selected directory name title
-                          Obx(
-                                () => Text(
-                              mainController.titleSelectedDirectoryName,
-                              style: TextStyle(
-                                fontSize: 60.sp,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.blue,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      /// search button and sort popupmenu row
-                      Row(
-                        children: [
-                          /// search bar widget
-                          const SearchBarWidget(),
-
-                          /// list sort popup menu
-                          Obx(
-                                () => PopupMenuButton<ListSortEnum>(
-                              initialValue: mainController.listSortCurrentValue,
-                              offset: const Offset(100, 50),
-                              iconSize: 34,
-                              itemBuilder: (BuildContext context) {
-                                return [
-                                  const PopupMenuItem<ListSortEnum>(
-                                    value: ListSortEnum.increase,
-                                    child: Text('Sırala (A-Z)'),
-                                  ),
-                                  const PopupMenuItem<ListSortEnum>(
-                                    value: ListSortEnum.decrease,
-                                    child: Text('Sırala (Z-A)'),
-                                  ),
-                                ];
-                              },
-                              onSelected: mainController.changelistSortDirection,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+                    /// sentence list
+                    const SentenceListWidget(),
+                  ],
                 ),
-
-                /// sentence list
-                const SentenceListWidget(),
-              ],
+              ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
-  /// when menu button clicked
+  ///endregion
+
+  ///#region event methods
+
+  ///#region menu toggle event method
   void menuToggle() {
-    setState(() {
-      if (isMenuOpen) {
-        animationController.reverse();
-      } else {
-        animationController.forward();
-      }
-      defaultDashboardOpacity = defaultDashboardOpacity == 1 ? 0.6 : 1;
-      isMenuOpen = !isMenuOpen;
-    });
+    if (isMenuOpen) {
+      animationController.reverse();
+    } else {
+      animationController.forward();
+    }
+    isMenuOpen = !isMenuOpen;
   }
 
-  /// directory remove alert dialog
+  ///#endregion
+
+  ///#region remove directory alert dialog
   void removeDirectoryDialog(DirectoryModel currentDirectory) {
     Get.defaultDialog(
       title: 'UYARI',
@@ -343,4 +397,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       ],
     );
   }
+
+  ///#endregion
+
+  ///#endregion
+
 }
