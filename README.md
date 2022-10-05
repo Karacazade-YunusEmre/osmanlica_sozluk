@@ -1,3 +1,5 @@
 # lugat
 
-Risale-i Nur Lugat Android-IOS Projesi
+Osmanlıca lugat uygulaması
+
+
