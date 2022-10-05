@@ -16,7 +16,6 @@ Kelimeleri guruplamak için uygulama'da klasör oluşturulabilir
 
 ![Screenshot from 2022-10-05 15-12-38](https://user-images.githubusercontent.com/40487051/194058413-94575e30-00e2-4f40-98c7-a59127aa1925.png)
 
-
 Oluşturulan klasörler ile birlikte uygulamanın varsayılan klasör yapıları sol üstten menü tuşuna basılarak listelenebilir.
 
 ![Screenshot from 2022-10-05 15-12-45](https://user-images.githubusercontent.com/40487051/194059507-139efdc4-3ade-45c3-9799-f51ca8d5ad41.png)
@@ -25,6 +24,7 @@ Oluşturulan klasörler ile birlikte uygulamanın varsayılan klasör yapıları
 
 
 Herbir kelime içinden istenilen klasöre atanabilir.
+
 ![image](https://user-images.githubusercontent.com/40487051/194061658-edb0c840-ca12-4522-97a7-c8e28c58512b.png)
 
 Uygulama'da istenilen klasör'de hızlıca arama yapılabilir.
