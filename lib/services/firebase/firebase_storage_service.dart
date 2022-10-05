@@ -21,7 +21,8 @@ class FirebaseStorageService extends ISentenceStorageBaseService {
       List<SentenceModel> sentenceList = [];
 
       for (QueryDocumentSnapshot<Map<String, dynamic>> item in querySnapshot.docs) {
-        SentenceModel sentenceModel = SentenceModel.fromJson(item.data());
+        // SentenceModel sentenceModel = SentenceModel.fromJson(item.data());
+        SentenceModel sentenceModel = SentenceModel(id: item.data()['id'], title: item.data()['title'], content: item.data()['content'], directoryId: '1');
         sentenceList.add(sentenceModel);
       }
       return sentenceList;

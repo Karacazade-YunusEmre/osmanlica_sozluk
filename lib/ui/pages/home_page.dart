@@ -289,10 +289,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                           ///#region search button and sort popupmenu row
                           Row(
                             children: [
-                              ///#region search bar widget
+                              /// search bar widget
                               const SearchBarWidget(),
-
-                              ///#endregion search bar widget
 
                               ///#region list sort popup menu
                               Obx(
@@ -375,8 +373,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       actions: [
         ElevatedButton(
           onPressed: () {
-            mainController.directoryList.remove(currentDirectory);
-            directoryDal.delete(currentDirectory);
+            mainController.removeDirectory(currentDirectory);
 
             Get.back();
             Get.snackbar(

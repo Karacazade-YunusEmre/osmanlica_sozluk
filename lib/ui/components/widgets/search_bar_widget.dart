@@ -88,7 +88,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> with SingleTickerProv
                         child: InkWell(
                           onTap: () {
                             textController.clear();
-                            // mainController.setSentenceListDefault();
+                            mainController.loadSentenceListAccordingToDirectoryId();
                           },
                           child: const Icon(Icons.close, size: 24),
                         ),
@@ -187,11 +187,13 @@ class _SearchBarWidgetState extends State<SearchBarWidget> with SingleTickerProv
                         if (toggle == 0) {
                           toggle = 1;
                           animationController.forward();
+                          FocusManager.instance.primaryFocus?.requestFocus();
                         } else {
                           toggle = 0;
                           animationController.reverse();
                           textController.clear();
-                          // mainController.setSentenceListDefault();
+                          mainController.loadSentenceListAccordingToDirectoryId();
+                          FocusManager.instance.primaryFocus?.unfocus();
                         }
                       },
                     ),

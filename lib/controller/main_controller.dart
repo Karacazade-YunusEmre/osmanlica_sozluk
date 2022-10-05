@@ -1,10 +1,10 @@
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
-import '/utilities/string_extensions.dart';
 import '/model/concrete/directory_model.dart';
 import '/model/concrete/sentence_model.dart';
 import '/utilities/enums.dart';
+import '/utilities/string_extensions.dart';
 import '../main.dart';
 
 /// Created by Yunus Emre Yıldırım
@@ -14,6 +14,7 @@ class MainController extends GetxController {
   final selectedDirectoryBox = GetStorage();
   final fixedSentenceList = <SentenceModel>[];
   final fixedDirectoryList = <DirectoryModel>[];
+  final fixedFilteredList = <SentenceModel>[];
 
   final sentenceList = <SentenceModel>[].obs;
   final directoryList = <DirectoryModel>[].obs;
@@ -30,6 +31,7 @@ class MainController extends GetxController {
     await setupDirectoryList();
     setupSelectedDirectoryId();
     setupSelectedDirectoryName();
+    setupFixedFilteredList();
   }
 
   ///#region getter and setter
@@ -67,7 +69,12 @@ class MainController extends GetxController {
         sentenceDal.addAll(fixedSentenceList);
       }
     }
-    sentenceList.addAll(fixedSentenceList);
+    String? directoryId = readDirectoryIdFromBox();
+    if (directoryId != null) {
+      sentenceList.addAll(fixedSentenceList.where((element) => element.directoryId == directoryId).toList());
+    } else {
+      sentenceList.addAll(fixedSentenceList);
+    }
   }
 
   /// directoryList setup on init
@@ -87,7 +94,7 @@ class MainController extends GetxController {
 
   /// setup selected directory Id
   void setupSelectedDirectoryId() {
-    String? directoryId = selectedDirectoryBox.read('selectedDirectoryId');
+    String? directoryId = readDirectoryIdFromBox();
     if (directoryId != null) {
       selectedDirectoryId = directoryId;
     } else {
@@ -97,7 +104,7 @@ class MainController extends GetxController {
 
   /// setup selected directory name for title
   void setupSelectedDirectoryName() {
-    String? directoryId = selectedDirectoryBox.read('selectedDirectoryId');
+    String? directoryId = readDirectoryIdFromBox();
 
     if (directoryId != null) {
       DirectoryModel selectedDirectory = directoryList.firstWhere((directory) => directory.id == directoryId);
@@ -106,6 +113,14 @@ class MainController extends GetxController {
       selectedDirectoryName = 'Tüm Kelimeler';
     }
   }
+
+  ///#region setup fixed filtered list
+  void setupFixedFilteredList() {
+    fixedFilteredList.clear();
+    fixedFilteredList.addAll(fixedSentenceList.where((element) => element.directoryId == selectedDirectoryId).toList());
+  }
+
+  ///#endregion
 
   ///#endregion setup methods
 
@@ -138,34 +153,37 @@ class MainController extends GetxController {
   void searchSentence(String? query) {
     List<SentenceModel> filteredList = [];
     if (query == null || query.isEmpty) {
-      filteredList.addAll(fixedSentenceList);
+      filteredList.addAll(fixedFilteredList);
     } else {
       filteredList = [];
-      filteredList = fixedSentenceList.where((element) => element.title.fixingTextForSearching.contains(query.fixingTextForSearching)).toList();
+      filteredList = fixedFilteredList.where((element) => element.title.fixingTextForSearching.contains(query.fixingTextForSearching)).toList();
     }
     sentenceList.clear();
     sentenceList.addAll(filteredList);
   }
 
   ///#region selectedDirectory change value
-  void changeSelectedDirectory(String? newValue) {
-    if (newValue != null) {
-      selectedDirectoryId = newValue;
-      _loadSentenceListAccordingToDirectoryId();
+  void changeSelectedDirectory(String? directoryId) {
+    if (directoryId != null) {
+      selectedDirectoryId = directoryId;
+      loadSentenceListAccordingToDirectoryId();
 
       /// save selected directory id
-      selectedDirectoryBox.write('selectedDirectoryId', newValue);
+      saveDirectoryIdToBox(directoryId);
 
-      DirectoryModel selectedDirectory = directoryList.firstWhere((element) => element.id == newValue);
+      DirectoryModel selectedDirectory = directoryList.firstWhere((element) => element.id == directoryId);
 
       /// set selected directory name for title
       selectedDirectoryName = selectedDirectory.name;
+
+      setupFixedFilteredList();
     }
   }
+
   ///#endregion
 
   ///#region load sentenceList according to selectedDirectoryId
-  void _loadSentenceListAccordingToDirectoryId() {
+  void loadSentenceListAccordingToDirectoryId() {
     List<SentenceModel> newList = [];
 
     for (SentenceModel item in fixedSentenceList) {
@@ -176,6 +194,7 @@ class MainController extends GetxController {
     sentenceList.clear();
     sentenceList.addAll(newList);
   }
+
   ///#endregion
 
   /// change sentence in directory
@@ -191,6 +210,46 @@ class MainController extends GetxController {
     directoryDal.update(newDirectory);
   }
 
+  /// remove directory
+  Future<void> removeDirectory(DirectoryModel removedDirectory) async {
+    if (removedDirectory.id == selectedDirectoryId) {
+      selectedDirectoryId = '1';
+    }
+
+    changeSelectedDirectory(selectedDirectoryId);
+    directoryList[0].sentenceCount += removedDirectory.sentenceCount;
+
+    for(SentenceModel item in fixedSentenceList){
+      if(item.directoryId == removedDirectory.id){
+        item.directoryId = '1';
+        sentenceDal.update(item);
+      }
+    }
+
+    fixedDirectoryList.remove(removedDirectory);
+    directoryList.remove(removedDirectory);
+    directoryDal.delete(removedDirectory);
+  }
+
   ///#endregion event methods
+
+  ///#region general purpose methods
+
+  /// save current directory id to box
+  void saveDirectoryIdToBox(String directoryId) {
+    selectedDirectoryBox.write('selectedDirectoryId', directoryId);
+  }
+
+  /// read current directory id from box
+  String? readDirectoryIdFromBox() {
+    String? id = selectedDirectoryBox.read('selectedDirectoryId');
+    if (id != null) {
+      return id;
+    } else {
+      return null;
+    }
+  }
+
+  ///#endregion general purpose methods
 
 }

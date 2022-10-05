@@ -6,7 +6,7 @@ extension StringExtensions on String {
   /// remove alphanumeric characters from directory name
   String get getFixDirectoryName {
     List<String> tempCharacters = [];
-    RegExp regexp = RegExp(r'[a-zA-Z0-9]+', multiLine: true);
+    RegExp regexp = RegExp(r'[a-zA-Z0-9öçşığüÖÇŞIĞÜ]+', multiLine: true);
 
     Iterable<RegExpMatch> matches = regexp.allMatches(toLowerCase());
 
