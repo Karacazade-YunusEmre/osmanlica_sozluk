@@ -1,5 +1,5 @@
 # lugat
 
-Osmanlıca lugat uygulaması
+Osmanlıca lugat Android ve IOS uygulaması
 
 
